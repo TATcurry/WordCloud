@@ -25,7 +25,7 @@ headers = {
 }
 url = "https://xueqiu.com"
 param = {
-         'count': 100,
+         'count': 10,
          'page': 1
          }
 
@@ -45,9 +45,6 @@ def get_html_content(keyword):
     # 获取链接数据
     link_data = json.loads(response.text)['list']
     index = 0
-    # 清空文件内容
-    f = open('word.txt', "r+")
-    f.truncate()
     for item in link_data:
         response = requests.get(url + item["target"], headers=headers)
         # 使用BeautifulSoup解析代码,并锁定页码指定标签内容
@@ -86,7 +83,9 @@ def create_word_cloud():
 
 def main():
     keyword = input('What is your search keyword?\n')
-    get_html_content(keyword)
+    total_page = get_html_content(keyword)
+    for i in range(total_page):
+        get_html_content(keyword)
     create_word_cloud()
 
 
