@@ -24,10 +24,6 @@ headers = {
               'Hm_lpvt_1db88642e346389874251b5a1eded6e3=1575613105'
 }
 url = "https://xueqiu.com"
-param = {
-         'count': 10,
-         'page': 1
-         }
 
 
 def translate_to_chinese(string):
@@ -37,9 +33,27 @@ def translate_to_chinese(string):
     return result;
 
 
-def get_html_content(keyword):
+def get_article_count(keyword):
     # 填入关键字
-    param['q'] = keyword
+    parameter = {
+        'count': 10,
+        'page': 1,
+        'q': keyword
+    }
+    response = requests.get(url + "/statuses/search.json", params=parameter, headers=headers)
+    print(response)
+    # 获取链接数据
+    max_page = json.loads(response.text)['maxPage']
+    return max_page
+
+
+def get_html_content(keyword, page):
+    # 填入关键字
+    param = {
+        'count': 10,
+        'page': page,
+        'q': keyword
+    }
     response = requests.get(url + "/statuses/search.json", params=param, headers=headers)
     print(response)
     # 获取链接数据
@@ -83,9 +97,12 @@ def create_word_cloud():
 
 def main():
     keyword = input('What is your search keyword?\n')
-    total_page = get_html_content(keyword)
+    total_page = get_article_count(keyword)
+    # 清空文件内容
+    f = open('word.txt', "r+")
+    f.truncate()
     for i in range(total_page):
-        get_html_content(keyword)
+        get_html_content(keyword, i)
     create_word_cloud()
 
 
